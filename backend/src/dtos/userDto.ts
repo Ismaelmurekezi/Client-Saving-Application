@@ -5,6 +5,13 @@ export interface RegisterDto {
   deviceId?: string;
 }
 
+
+export interface LoginDto {
+  email: string;
+  password: string;
+  deviceId?: string;
+}
+
 export interface UserResponseDto {
   id: string;
   name: string;

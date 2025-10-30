@@ -12,7 +12,7 @@ const options: swaggerJSDoc.Options = {
     },
     servers: [
         {
-            url: process.env.NODE_ENV === 'production' ? 'https://your-production-url.com' : 'http://localhost:5000',
+            url: process.env.NODE_ENV === 'production' ? 'https://production-url.com' : 'http://localhost:5000',
             description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server',
         },
         ],
