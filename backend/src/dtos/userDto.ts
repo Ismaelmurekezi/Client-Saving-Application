@@ -5,7 +5,6 @@ export interface RegisterDto {
   deviceId?: string;
 }
 
-
 export interface LoginDto {
   email: string;
   password: string;
@@ -21,3 +20,14 @@ export interface UserResponseDto {
   deviceId?: string;
 }
 
+export interface TransactionDto {
+  amount: number;
+}
+
+export interface TransactionResponseDto {
+  id: string;
+  type: string;
+  amount: number;
+  balanceAfter: number;
+  createdAt: Date;
+}

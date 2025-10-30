@@ -1,10 +1,11 @@
-import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
 import { connectDatabase } from "./config/database.js";
 import authRoutes from "./routes/authRoute.js";
-import { specs,swaggerUi } from "./config/swagger.js";
-
-dotenv.config();
+import { specs, swaggerUi } from "./config/swagger.js";
+import savingsRoutes from "./routes/savingsRoute.js";
 const app = express();
 
 const PORT = process.env.PORT || 5000;
@@ -16,8 +17,10 @@ app.get("/", (request, response) => {
 });
 
 app.use(express.json());
-app.use
 app.use("/api/auth", authRoutes);
+app.use("/api/savings", savingsRoutes);
+
+// Swagger Documentation
 app.use(
   "/api-docs",
   swaggerUi.serve,
