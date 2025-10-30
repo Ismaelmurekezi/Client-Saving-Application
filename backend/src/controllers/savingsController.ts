@@ -51,4 +51,53 @@ export const deposit = async (req: AuthRequest, res: Response) => {
   }
 };
 
+export const withdraw = async (req: AuthRequest, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { amount }: TransactionDto = req.body;
+    const userId = req.user._id;
+
+    if (amount <= 0) {
+      return res.status(400).json({ message: "Amount must be positive" });
+    }
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.balance < amount) {
+      return res.status(400).json({ message: "Insufficient balance" });
+    }
+
+    user.balance -= amount;
+    await user.save();
+
+    const transaction = new transactionModel({
+      userId,
+      type: "withdraw",
+      amount,
+      balanceAfter: user.balance,
+    });
+    await transaction.save();
+
+    res.json({
+      message: "Withdrawal successful",
+      balance: user.balance,
+      transaction: {
+        id: String(transaction._id),
+        type: transaction.type,
+        amount: transaction.amount,
+        balanceAfter: transaction.balanceAfter,
+        createdAt: transaction.createdAt,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
