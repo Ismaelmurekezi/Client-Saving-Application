@@ -101,3 +101,16 @@ export const withdraw = async (req: AuthRequest, res: Response) => {
   }
 };
 
+export const getBalance = async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ balance: user.balance });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+

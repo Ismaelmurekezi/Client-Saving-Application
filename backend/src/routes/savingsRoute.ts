@@ -2,6 +2,7 @@ import { Router } from "express";
 import { body } from "express-validator";
 import {
   deposit,
+  getBalance,
   withdraw,
 
 } from "../controllers/savingsController.js";
@@ -68,5 +69,19 @@ router.post(
 router.post('/withdraw', authenticateToken, [
   body('amount').isFloat({ min: 0.01 })
 ], withdraw);
+
+/**
+ * @swagger
+ * /api/savings/balance:
+ *   get:
+ *     summary: Get current balance
+ *     tags: [Savings]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current balance
+ */
+router.get('/balance', authenticateToken, getBalance);
 
 export default router;
