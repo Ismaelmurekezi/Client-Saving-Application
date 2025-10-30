@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { connectDatabase } from "./config/database.js";
 import authRoutes from "./routes/authRoute.js";
+import { specs,swaggerUi } from "./config/swagger.js";
 
 dotenv.config();
 const app = express();
@@ -15,8 +16,13 @@ app.get("/", (request, response) => {
 });
 
 app.use(express.json());
+app.use
 app.use("/api/auth", authRoutes);
-
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs)
+);
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
 });
