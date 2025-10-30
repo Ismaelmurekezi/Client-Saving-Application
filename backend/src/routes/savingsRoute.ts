@@ -3,6 +3,7 @@ import { body } from "express-validator";
 import {
   deposit,
   getBalance,
+  getTransactions,
   withdraw,
 
 } from "../controllers/savingsController.js";
@@ -83,5 +84,18 @@ router.post('/withdraw', authenticateToken, [
  *         description: Current balance
  */
 router.get('/balance', authenticateToken, getBalance);
+/**
+ * @swagger
+ * /api/savings/transactions:
+ *   get:
+ *     summary: Get transaction history
+ *     tags: [Savings]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Transaction history
+ */
+router.get('/transactions', authenticateToken, getTransactions);
 
 export default router;

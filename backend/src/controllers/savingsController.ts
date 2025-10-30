@@ -2,7 +2,7 @@ import type { Response } from "express";
 import { validationResult } from "express-validator";
 import userModel from "../models/userModel.js";
 import transactionModel from "../models/transactionModel.js";
-import type { TransactionDto } from "../dtos/userDto.js";
+import type { TransactionDto, TransactionResponseDto } from "../dtos/userDto.js";
 import type { AuthRequest } from "../middlewares/auth.js";
 
 export const deposit = async (req: AuthRequest, res: Response) => {
@@ -109,6 +109,28 @@ export const getBalance = async (req: AuthRequest, res: Response) => {
     }
 
     res.json({ balance: user.balance });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getTransactions = async (req: AuthRequest, res: Response) => {
+  try {
+    const transactions = await transactionModel.find({ userId: req.user._id })
+      .sort({ createdAt: -1 })
+      .limit(50);
+
+    const transactionResponses: TransactionResponseDto[] = transactions.map(
+      (t) => ({
+        id: String(t._id),
+        type: t.type,
+        amount: t.amount,
+        balanceAfter: t.balanceAfter,
+        createdAt: t.createdAt,
+      })
+    );
+
+    res.json({ transactions: transactionResponses });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
