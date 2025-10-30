@@ -1,6 +1,9 @@
 # Backend
 backend/node_modules/
 backend/.env
+backend/*.env.example
+backend/dist/ 
+
 
 # Frontend (if any)
 frontend/node_modules/

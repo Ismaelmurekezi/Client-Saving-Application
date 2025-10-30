@@ -1,8 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connectDatabase } from "./config/database.js";
+import authRoutes from "./routes/authRoute.js";
 
-// configures dotenv to work in your application
 dotenv.config();
 const app = express();
 
@@ -13,6 +13,14 @@ app.get("/", (request, response) => {
     .status(200)
     .send("Welcome to the Client Saving Application Backend!");
 });
+
+app.use(express.json());
+app.use("/api/auth", authRoutes);
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
 
 // Database connection and server start
 const startServer = async () => {
