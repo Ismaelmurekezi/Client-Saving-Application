@@ -1,8 +1,7 @@
 import type { Response } from "express";
 import { validationResult } from "express-validator";
-import userModel from "../models/userModel.js";
-import transactionModel from "../models/transactionModel.js";
-import type { TransactionDto, TransactionResponseDto } from "../dtos/userDto.js";
+import { savingsService } from "../services/savingsService.js";
+import type { TransactionDto } from "../dtos/userDto.js";
 import type { AuthRequest } from "../middlewares/auth.js";
 
 export const deposit = async (req: AuthRequest, res: Response) => {
@@ -12,42 +11,19 @@ export const deposit = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { amount }: TransactionDto = req.body;
-    const userId = req.user._id;
-
-    if (amount <= 0) {
-      return res.status(400).json({ message: "Amount must be positive" });
-    }
-
-    const user = await userModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    user.balance += amount;
-    await user.save();
-
-    const transaction = new transactionModel({
-      userId,
-      type: "deposit",
-      amount,
-      balanceAfter: user.balance,
-    });
-    await transaction.save();
+    const transactionData: TransactionDto = req.body;
+    const { balance, transaction } = await savingsService.deposit(req.user._id, transactionData);
 
     res.json({
       message: "Deposit successful",
-      balance: user.balance,
-      transaction: {
-        id: String(transaction._id),
-        type: transaction.type,
-        amount: transaction.amount,
-        balanceAfter: transaction.balanceAfter,
-        createdAt: transaction.createdAt,
-      },
+      balance,
+      transaction,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    const message = error instanceof Error ? error.message : "Server error";
+    const status = message === "Amount must be positive" ? 400 :
+                   message === "User not found" ? 404 : 500;
+    res.status(status).json({ message });
   }
 };
 
@@ -58,79 +34,37 @@ export const withdraw = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { amount }: TransactionDto = req.body;
-    const userId = req.user._id;
-
-    if (amount <= 0) {
-      return res.status(400).json({ message: "Amount must be positive" });
-    }
-
-    const user = await userModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    if (user.balance < amount) {
-      return res.status(400).json({ message: "Insufficient balance" });
-    }
-
-    user.balance -= amount;
-    await user.save();
-
-    const transaction = new transactionModel({
-      userId,
-      type: "withdraw",
-      amount,
-      balanceAfter: user.balance,
-    });
-    await transaction.save();
+    const transactionData: TransactionDto = req.body;
+    const { balance, transaction } = await savingsService.withdraw(req.user._id, transactionData);
 
     res.json({
       message: "Withdrawal successful",
-      balance: user.balance,
-      transaction: {
-        id: String(transaction._id),
-        type: transaction.type,
-        amount: transaction.amount,
-        balanceAfter: transaction.balanceAfter,
-        createdAt: transaction.createdAt,
-      },
+      balance,
+      transaction,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    const message = error instanceof Error ? error.message : "Server error";
+    const status = message === "Amount must be positive" || message === "Insufficient balance" ? 400 :
+                   message === "User not found" ? 404 : 500;
+    res.status(status).json({ message });
   }
 };
 
 export const getBalance = async (req: AuthRequest, res: Response) => {
   try {
-    const user = await userModel.findById(req.user._id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.json({ balance: user.balance });
+    const balance = await savingsService.getBalance(req.user._id);
+    res.json({ balance });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    const message = error instanceof Error ? error.message : "Server error";
+    const status = message === "User not found" ? 404 : 500;
+    res.status(status).json({ message });
   }
 };
 
 export const getTransactions = async (req: AuthRequest, res: Response) => {
   try {
-    const transactions = await transactionModel.find({ userId: req.user._id })
-      .sort({ createdAt: -1 })
-      .limit(50);
-
-    const transactionResponses: TransactionResponseDto[] = transactions.map(
-      (t) => ({
-        id: String(t._id),
-        type: t.type,
-        amount: t.amount,
-        balanceAfter: t.balanceAfter,
-        createdAt: t.createdAt,
-      })
-    );
-
-    res.json({ transactions: transactionResponses });
+    const transactions = await savingsService.getTransactions(req.user._id);
+    res.json({ transactions });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
