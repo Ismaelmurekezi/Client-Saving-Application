@@ -12,25 +12,40 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import VerificationPending from "./pages/VerificationPending";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { useAuthStore } from "./store/authStore";
 
 const App: React.FC = () => {
-  const isTrue = true;
+  const { isAuthenticated } = useAuthStore();
 
   return (
     <Router>
       <div className="App">
         <Routes>
           <Route path="/register" element={<Register />} />
-          <Route
-            path="/login"
-            element={isTrue ? <Navigate to="/dashboard" /> : <Login />}
-          />
-          <Route path="/dashboard" element={<Layout />} />
+          <Route path="/login" element={<Login />} />
           <Route
             path="/verification-pending"
             element={<VerificationPending />}
           />
-          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
         </Routes>
         <ToastContainer
           position="top-right"

@@ -1,10 +1,21 @@
 import { Bell, BarChart3, LayoutDashboard, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import DashboardContent from "../components/DashboardContent";
 import Analytics from "../pages/Analytics";
+import { useAuthStore } from "../store/authStore";
 
 const Layout = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    toast.success("Logged out successfully");
+    navigate("/login");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -40,7 +51,10 @@ const Layout = () => {
           </button>
         </nav>
 
-        <button className="flex items-center gap-3 px-8 py-4 text-red-600 hover:bg-red-50 m-4 rounded-lg">
+        <button 
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-8 py-4 text-red-600 hover:bg-red-50 m-4 rounded-lg"
+        >
           <LogOut className="w-5 h-5" />
           <span>Logout</span>
         </button>
@@ -51,18 +65,20 @@ const Layout = () => {
         {/* Header */}
         <header className="bg-white border-b px-8 py-4 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-800">
-            {activeTab === "dashboard" && "Welcome back, Bryan"}
+            {activeTab === "dashboard" && `Welcome back, ${user?.name || "User"}`}
             {activeTab === "analytics" && "Analytics"}
           </h2>
           <div className="flex items-center gap-4">
             <Bell className="w-6 h-6 text-gray-600" />
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-medium">BM</span>
+                <span className="text-white font-medium">
+                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                </span>
               </div>
               <div>
-                <p className="font-medium text-sm">Bryan Mike</p>
-                <p className="text-xs text-gray-500">Student</p>
+                <p className="font-medium text-sm">{user?.name || "User"}</p>
+                <p className="text-xs text-gray-500">Balance: ${user?.balance || 0}</p>
               </div>
             </div>
           </div>
