@@ -1,6 +1,20 @@
-import { ChevronLeft, ChevronRight, Filter, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Filter, Search, RefreshCw } from "lucide-react";
 
-export default function TransactionTable() {
+interface Transaction {
+  id: string;
+  type: string;
+  amount: number;
+  balanceAfter: number;
+  createdAt: string;
+}
+
+interface TransactionTableProps {
+  transactions: Transaction[];
+  isLoading: boolean;
+  onRefresh: () => void;
+}
+
+export default function TransactionTable({ transactions, isLoading, onRefresh }: TransactionTableProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm">
       <div className="p-4">
@@ -14,6 +28,14 @@ export default function TransactionTable() {
             />
           </div>
           <div className="flex gap-3">
+            <button 
+              onClick={onRefresh}
+              disabled={isLoading}
+              className="px-4 py-2 border border-gray-300 rounded-md flex items-center gap-2 hover:bg-gray-50 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
             <button className="px-4 py-2 border border-gray-300 rounded-md flex items-center gap-2 hover:bg-gray-50">
               <Filter className="w-4 h-4" />
               Filter
@@ -33,58 +55,56 @@ export default function TransactionTable() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm text-gray-700">2024-01-15</td>
-                <td className="px-6 py-4">
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Deposit
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-green-600 font-medium">+$500</td>
-                <td className="px-6 py-4 text-sm text-gray-700">$12,450</td>
-                <td className="px-6 py-4">
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Completed
-                  </span>
-                </td>
-              </tr>
-              <tr className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm text-gray-700">2024-01-14</td>
-                <td className="px-6 py-4">
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    Withdraw
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-red-600 font-medium">-$200</td>
-                <td className="px-6 py-4 text-sm text-gray-700">$11,950</td>
-                <td className="px-6 py-4">
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Completed
-                  </span>
-                </td>
-              </tr>
-              <tr className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm text-gray-700">2024-01-13</td>
-                <td className="px-6 py-4">
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Deposit
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-green-600 font-medium">+$1,000</td>
-                <td className="px-6 py-4 text-sm text-gray-700">$12,150</td>
-                <td className="px-6 py-4">
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Completed
-                  </span>
-                </td>
-              </tr>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                    Loading transactions...
+                  </td>
+                </tr>
+              ) : transactions.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                    No transactions found
+                  </td>
+                </tr>
+              ) : (
+                transactions.map((transaction) => (
+                  <tr key={transaction.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      {new Date(transaction.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        transaction.type === 'deposit'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+                      </span>
+                    </td>
+                    <td className={`px-6 py-4 text-sm font-medium ${
+                      transaction.type === 'deposit' ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {transaction.type === 'deposit' ? '+' : '-'}${transaction.amount.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      ${transaction.balanceAfter.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Completed
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
         <div className="flex items-center justify-between mt-4">
           <p className="text-sm text-gray-700">
-            Showing 1-3 of 156 results
+            Showing {transactions.length} of {transactions.length} results
           </p>
           <div className="flex items-center gap-4">
             <button className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-800">

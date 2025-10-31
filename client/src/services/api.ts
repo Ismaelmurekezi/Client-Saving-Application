@@ -50,5 +50,11 @@ export const authAPI = {
   getVerificationStatus: (deviceId: string) =>
     api.get(`/auth/verification-status/${deviceId}`),
 };
+export const savingsAPI = {
+  deposit: (data: TransactionData) => api.post("/savings/deposit", data),
+  withdraw: (data: TransactionData) => api.post("/savings/withdraw", data),
+  getBalance: () => api.get("/savings/balance"),
+  getTransactions: () => api.get("/savings/transactions"),
+};
 
 export default api;

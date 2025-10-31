@@ -78,7 +78,7 @@ const Layout = () => {
               </div>
               <div>
                 <p className="font-medium text-sm">{user?.name || "User"}</p>
-                <p className="text-xs text-gray-500">Balance: ${user?.balance || 0}</p>
+                <p className="text-xs text-gray-500">Student</p>
               </div>
             </div>
           </div>
