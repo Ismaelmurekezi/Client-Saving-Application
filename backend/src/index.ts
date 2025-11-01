@@ -25,15 +25,17 @@ app.use(helmet({
   },
 }));
 
-const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-netlify-app.netlify.app', 'https://your-custom-domain.com']
-    : ['http://localhost:5173', 'http://localhost:5174'],
-  credentials: true,
-  optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5001",
+      process.env.FRONTEND_URL,
+      process.env.RENDER_EXTERNAL_URL,
+    ].filter(Boolean) as string[],
+    credentials: true,
+  })
+);
 
 // Rate limiting
 const limiter = rateLimit({
