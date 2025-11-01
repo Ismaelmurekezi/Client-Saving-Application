@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isAuthenticated, checkSession, updateActivity } = useAuthStore();
+  const { checkSession, updateActivity } = useAuthStore();
   const location = useLocation();
   const [isValidSession, setIsValidSession] = useState<boolean | null>(null);
 

@@ -16,7 +16,7 @@ const Login = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   
   const navigate = useNavigate();
-  const { setAuth, setDeviceId } = useAuthStore();
+  const { setAuth } = useAuthStore();
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};

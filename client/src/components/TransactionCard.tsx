@@ -27,7 +27,7 @@ export default function TransactionCard() {
         ? await savingsAPI.deposit({ amount: numAmount })
         : await savingsAPI.withdraw({ amount: numAmount });
       
-      const { balance, transaction } = response.data;
+      const { balance } = response.data;
       
       // Update balance in store
       updateBalance(balance);

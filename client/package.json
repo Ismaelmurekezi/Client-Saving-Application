@@ -11,10 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.16",
-    "@types/fingerprintjs2": "^2.0.0",
     "axios": "^1.13.1",
-    "fingerprintjs2": "^2.1.4",
-    "flowbite-react": "^0.12.10",
     "lucide-react": "^0.548.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

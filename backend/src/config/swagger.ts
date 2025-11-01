@@ -11,11 +11,17 @@ const options: swaggerJSDoc.Options = {
         "API documentation for the Client Saving Application backend.",
     },
     servers: [
-        {
-            url: process.env.NODE_ENV === 'production' ? 'https://production-url.com' : 'http://localhost:5000',
-            description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server',
-        },
-        ],
+      {
+        url: process.env.NODE_ENV === "production" 
+          ? (process.env.RENDER_EXTERNAL_URL || "https://your-render-app.onrender.com")
+          : "http://localhost:5000",
+        description: process.env.NODE_ENV === "production" ? "Production server" : "Development server",
+      },
+      ...(process.env.NODE_ENV === "production" 
+        ? [{ url: "http://localhost:5000", description: "Development server" }]
+        : [{ url: process.env.RENDER_EXTERNAL_URL || "https://your-render-app.onrender.com", description: "Production server" }]
+      ),
+    ],
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -31,7 +37,10 @@ const options: swaggerJSDoc.Options = {
       },
     ],
   },
-  apis: ["./src/routes/*.ts", "./src/models/*.ts"],
+  apis:
+    process.env.NODE_ENV === "production"
+      ? ["./dist/routes/*.js"]
+      : ["./src/routes/*.ts"],
 };
 
 const specs = swaggerJSDoc(options);
