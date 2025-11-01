@@ -45,7 +45,7 @@ const limiter = rateLimit({
 app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 
-app.get("/", (request, response) => {
+app.get("/", (request: express.Request, response: express.Response) => {
   response
     .status(200)
     .send("Welcome to the Client Saving Application Backend!");
@@ -60,7 +60,7 @@ app.use(
   swaggerUi.serve,
   swaggerUi.setup(specs)
 );
-app.get("/health", (req, res) => {
+app.get("/health", (req: express.Request, res: express.Response) => {
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
 });
 

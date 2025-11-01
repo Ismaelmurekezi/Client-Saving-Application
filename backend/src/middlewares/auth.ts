@@ -4,6 +4,8 @@ import User from "../models/userModel.js";
 
 export interface AuthRequest extends Request {
   user?: any;
+  body: any;
+  headers: any;
 }
 
 export const authenticateToken = async (
